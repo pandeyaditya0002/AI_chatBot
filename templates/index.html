@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot | AI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <h2>
+            <img src="../static/intelligent-assistant_12775374.png" alt="Bot"> AI ChatBot
+        </h2>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">
+                <img src="../static/send_14359825.png" alt="Send">
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            let userInput = document.getElementById("user-input").value.trim();
+            if (userInput === "") return;
+
+            let chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="chat user"><strong>You:</strong> ${userInput}</div>`;
+
+            fetch("/chat", {
+                method: "POST",
+                body: JSON.stringify({ message: userInput }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += `<div class="chat bot"><strong>Bot:</strong> ${data.response}</div>`;
+                document.getElementById("user-input").value = "";
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
